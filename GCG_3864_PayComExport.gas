@@ -1,0 +1,280 @@
+Program.Sub.ScreenSU.Start
+gui.Form1..create
+gui.Form1..caption("File Name and Location")
+gui.Form1..size(8025,3705)
+gui.Form1..minx(0)
+gui.Form1..miny(0)
+gui.Form1..position(0,0)
+gui.Form1..event(unload,form1_unload)
+gui.Form1..alwaysontop(False)
+gui.Form1..fontname("Arial")
+gui.Form1..fontsize(8)
+gui.Form1..forecolor(0)
+gui.Form1..fontstyle(,,,,)
+gui.Form1..BackColor(-2147483633)
+gui.Form1..controlbox(True)
+gui.Form1..maxbutton(False)
+gui.Form1..minbutton(True)
+gui.Form1..mousepointer(0)
+gui.Form1..moveable(True)
+gui.Form1..sizeable(False)
+gui.Form1..ShowInTaskBar(True)
+gui.Form1..titlebar(True)
+gui.Form1.lblFolder.create(label,"Folder Location",True,1230,255,1,200,1205,True,0,Arial,8,-2147483633,0)
+gui.Form1.lblFolder.defaultvalue("")
+gui.Form1.lblFolder.controlgroup(0)
+gui.Form1.txtFolder.create(textbox,"",True,6990,300,0,200,1435,True,0,Arial,8,-2147483643,1)
+gui.Form1.txtFolder.defaultvalue("")
+gui.Form1.txtFolder.controlgroup(0)
+gui.Form1.cmdBrowser.create(button)
+gui.Form1.cmdBrowser.caption("^")
+gui.Form1.cmdBrowser.visible(True)
+gui.Form1.cmdBrowser.size(300,300)
+gui.Form1.cmdBrowser.zorder(0)
+gui.Form1.cmdBrowser.position(7300,1435)
+gui.Form1.cmdBrowser.enabled(True)
+gui.Form1.cmdBrowser.fontname("Arial")
+gui.Form1.cmdBrowser.fontsize(8)
+gui.Form1.cmdBrowser.event(click,cmdbrowser_click)
+gui.Form1.cmdBrowser.defaultvalue("")
+gui.Form1.cmdBrowser.controlgroup(0)
+gui.Form1.lblName.create(label,"File Name",True,1935,255,1,200,1885,True,0,Arial,8,-2147483633,0)
+gui.Form1.lblName.defaultvalue("")
+gui.Form1.lblName.controlgroup(0)
+gui.Form1.txtName.create(textbox,"",True,3465,300,0,200,2110,True,0,Arial,8,-2147483643,1)
+gui.Form1.txtName.defaultvalue("")
+gui.Form1.txtName.controlgroup(0)
+gui.Form1.cmdSave.create(button)
+gui.Form1.cmdSave.caption("Save")
+gui.Form1.cmdSave.visible(True)
+gui.Form1.cmdSave.size(855,375)
+gui.Form1.cmdSave.zorder(0)
+gui.Form1.cmdSave.position(200,2610)
+gui.Form1.cmdSave.enabled(True)
+gui.Form1.cmdSave.fontname("Arial")
+gui.Form1.cmdSave.fontsize(8)
+gui.Form1.cmdSave.event(click,cmdsave_click)
+gui.Form1.cmdSave.defaultvalue("")
+gui.Form1.cmdSave.controlgroup(0)
+gui.Form1.lblStartDate.create(label,"Starting Date",True,1935,255,1,200,200,True,0,Arial,8,-2147483633,0)
+gui.Form1.lblStartDate.defaultvalue("")
+gui.Form1.lblStartDate.controlgroup(0)
+gui.Form1.dtpStart.create(datepicker)
+gui.Form1.dtpStart.visible(True)
+gui.Form1.dtpStart.size(1935,285)
+gui.Form1.dtpStart.zorder(0)
+gui.Form1.dtpStart.position(200,400)
+gui.Form1.dtpStart.enabled(True)
+gui.Form1.dtpStart.checkbox(False)
+gui.Form1.dtpStart.defaultvalue("")
+gui.Form1.dtpStart.controlgroup(0)
+gui.Form1.lblEndDate.create(label,"Ending Date",True,1935,255,1,4155,200,True,0,Arial,8,-2147483633,0)
+gui.Form1.lblEndDate.defaultvalue("")
+gui.Form1.lblEndDate.controlgroup(0)
+gui.Form1.dtpEnd.create(datepicker)
+gui.Form1.dtpEnd.visible(True)
+gui.Form1.dtpEnd.size(1935,285)
+gui.Form1.dtpEnd.zorder(0)
+gui.Form1.dtpEnd.position(4155,400)
+gui.Form1.dtpEnd.enabled(True)
+gui.Form1.dtpEnd.checkbox(False)
+gui.Form1.dtpEnd.defaultvalue("")
+gui.Form1.dtpEnd.controlgroup(0)
+gui.Form1.dtpStart.tabstop(True)
+gui.Form1.dtpStart.tabindex(1)
+gui.Form1.dtpEnd.tabstop(True)
+gui.Form1.dtpEnd.tabindex(2)
+gui.Form1.txtFolder.tabstop(True)
+gui.Form1.txtFolder.tabindex(3)
+gui.Form1.cmdBrowser.tabstop(True)
+gui.Form1.cmdBrowser.tabindex(4)
+gui.Form1.txtName.tabstop(True)
+gui.Form1.txtName.tabindex(5)
+gui.Form1.cmdSave.tabstop(True)
+gui.Form1.cmdSave.tabindex(6)
+
+
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+
+Variable.UDT.uExport.Define("sEmpID",String,Employee)
+Variable.UDT.uExport.Define("sDept",String,Dept)
+Variable.UDT.uExport.Define("sTimeIn",String,Time_In)
+Variable.UDT.uExport.Define("sTimeOut",String,Time_Out)
+Variable.UDT.uExport.Define("dDateIn",String,Date_In)
+Variable.UDT.uExport.Define("dDateOut",String,Date_Out)
+Variable.uGlobal.uExport.Declare("uExport")
+Variable.UDT.uEmpCode.Define("EmpID",String,EmpID)
+Variable.UDT.uEmpCode.Define("PayCom",String,PayCom)
+Variable.uGlobal.uEmpCode.Declare("uEmpCode")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+'Created for Netshape by SKC on 5/1/2016
+'This is Part of ARC project 3864.  This will run on the Transfer Labor to Payroll hook and will all the user to select a file location and Name.
+'The Records will be parsed and saved to the csv file.  This is a PayCom Export that will use a Paycom employee ID, and Paycom earn code.
+'The hours, dept, and run date will come straight from the PYRL_LABOR_XFER
+
+
+'Show Screen to get File Path Location
+
+F.ODBC.Connection!conx.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+F.Intrinsic.Variable.SetUDTFieldDateMask(V.uGlobal.uExport!dDateIN,"YYYYMMDD")
+F.Intrinsic.Variable.SetUDTFieldDateMask(V.uGlobal.uExport!dDateOut,"YYYYMMDD")
+Gui.Form1..Show
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_PayComExport.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+program.sub.form1_unload.start
+F.Intrinsic.Control.SetErrorHandler("form1_unload_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!conx.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("form1_unload_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_PayComExport.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.form1_unload.end
+
+program.sub.cmdbrowser_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdbrowser_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+V.Local.sPath.Declare(String)
+V.Local.iHandle.Declare(Long)
+
+F.Intrinsic.File.GetHandle(V.Local.iHandle)
+
+F.Intrinsic.UI.FolderBrowser("Select Save Location",V.Local.sPath)
+
+F.Intrinsic.Control.If(V.Local.sPath,!=,"***CANCEL***")
+	Gui.Form1.txtFolder.Text(V.Local.sPath)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdbrowser_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_PayComExport.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdbrowser_click.end
+
+program.sub.cmdsave_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdsave_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+V.Local.sFile.Declare(String)
+V.Local.sPath.Declare(String)
+V.Local.sSql.Declare(String)
+V.Local.sStartDate.Declare(String)
+V.Local.sEndDate.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.sTime.Declare(String)
+V.Local.iCount.Declare(Long)
+
+
+V.Local.sFile.Set(V.Screen.Form1!txtName.Text)
+V.Local.sPath.Set(V.Screen.Form1!txtFolder.Text)
+V.Local.sStartDate.Set(V.Screen.Form1!dtpStart.Value)
+V.Local.sEndDate.Set(V.Screen.Form1!dtpEnd.Value)
+F.Intrinsic.String.Format(V.Local.sStartDate,"YYYYMMDD",V.Local.sStartDate)
+F.Intrinsic.String.Format(V.Local.sEndDate,"YYYYMMDD",V.Local.sEndDate)
+
+
+
+F.Intrinsic.Control.If(V.Local.sFile.Trim,=,"","OR",V.Local.sPath.Trim,=,"")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.String.Build("{0}\{1}.csv",V.Local.sPath,V.Local.sFile,V.Local.sPath)
+
+F.Intrinsic.String.Build("Select Employee, Date_IN, Left (Time_IN, 4)as Time_In, Date_Out, Left (Time_Out,4)as Time_Out, Dept From TIME_ATTENDANCE where Charge_Date Between '{0}' and '{1}' and Rec_Type = 'T'",V.Local.sStartDate,V.Local.sEndDate,V.Local.sSql)
+F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstPay",V.Local.sSql)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstPay","V.uGlobal.uExport",False)
+F.ODBC.conx!rstPay.Close
+
+
+V.Local.sSql.Set("Select * From GCG_3869_Pay_Code")
+F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstEmp",V.Local.sSql)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstEmp","v.uGlobal.uEmpCode",False)
+F.ODBC.conx!rstEmp.Close
+
+V.Local.sFile.Set("")
+
+F.Intrinsic.Control.For(V.Local.iCount,V.uGlobal.uExport.LBound,V.uGlobal.uExport.UBound,1)
+	F.Intrinsic.Variable.UDTMultiSeek(V.uGlobal.uEmpCode!EmpID,V.uGlobal.uExport(v.Local.iCount)!sEmpID,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet,!=,"")
+		V.uGlobal.uExport(v.Local.iCount)!sEmpID.Set(V.uGlobal.uEmpCode(v.Local.sRet)!PayCom)
+	F.Intrinsic.Control.EndIf
+	F.Intrinsic.String.LimitSplit(V.uGlobal.uExport(v.Local.iCount)!sTimeIn,2,V.Local.sTime)
+	F.Intrinsic.String.Build("{0}:{1}",V.Local.sTime(0),V.Local.sTime(1),V.uGlobal.uExport(v.Local.iCount)!sTimeIn)
+	F.Intrinsic.String.LimitSplit(V.uGlobal.uExport(v.Local.iCount)!sTimeOut,2,V.Local.sTime)
+	F.Intrinsic.String.Build("{0}:{1}",V.Local.sTime(0),V.Local.sTime(1),V.uGlobal.uExport(v.Local.iCount)!sTimeOut)
+	F.Intrinsic.String.Format(V.uGlobal.uExport(v.Local.iCount)!dDateIn,"mm/dd/yyyy",V.uGlobal.uExport(v.Local.iCount)!dDateIn)
+	F.Intrinsic.String.Format(V.uGlobal.uExport(v.Local.iCount)!dDateOut,"mm/dd/yyyy",V.uGlobal.uExport(v.Local.iCount)!dDateOut)
+
+
+	'Build the File now
+	'Emp code, Dept code, Date, Punch Time, Punch Type, Earn Code, Comments, Labor Alloc, Hours, Dollars, Temp rate
+
+	F.Intrinsic.String.Build("{5}{0},{1},{2},{3},ID,,,,,,,{4}",V.uGlobal.uExport(v.Local.iCount)!sEmpID,V.uGlobal.uExport(v.Local.iCount)!sDept,V.uGlobal.uExport(v.Local.iCount)!dDateIn,V.uGlobal.uExport(v.Local.iCount)!sTimeIn,V.Ambient.NewLine,V.Local.sFile,V.Local.sFile)
+	F.Intrinsic.String.Build("{5}{0},{1},{2},{3},OD,,,,,,,{4}",V.uGlobal.uExport(v.Local.iCount)!sEmpID,V.uGlobal.uExport(v.Local.iCount)!sDept,V.uGlobal.uExport(v.Local.iCount)!dDateOut,V.uGlobal.uExport(v.Local.iCount)!sTimeOut,V.Ambient.NewLine,V.Local.sFile,V.Local.sFile)
+
+F.Intrinsic.Control.Next(V.Local.iCount)
+
+F.Intrinsic.File.String2File(V.Local.sPath,V.Local.sFile)
+
+F.Intrinsic.Control.CallSub(Form1_unload)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdsave_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_PayComExport.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdsave_click.end
+
+Program.Sub.Comments.Start
+${$0$}$GCG_3869_PayComExport$}$SKC$}$4/30/2016
+${$1$}$$}$$}$0$}$15290$}$Transfer Labor to Payroll Hook$}$5/1/2016 8:27:57 AM$}$The rundate and time will be used to get the records need for the Payroll export
+${$3$}$0$}$$}$-1$}$-1$}$$}$1/1/1900$}$This Part of ARC project 3864.  This will run from the Transfer Labor to Payroll Hook and will allow the User to select a file location and Name.  The records from the Pyrl_Labor_xfer table will be retreived based on the Run date.  The Paycom Employee ID will replace the GSS Employee ID, and the Paycom Earn Code will replace the GSS earn code.  The Hours, Dept and run date will come straight from the table, the csv will be created and saved with the file name and location selected by the user.
+Program.Sub.Comments.End
+
