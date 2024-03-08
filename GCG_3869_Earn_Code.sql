@@ -1,0 +1,5 @@
+CREATE TABLE "GCG_3869_Earn_Code"(
+ "GSS_Code" CHAR(2) NOT NULL ,
+ "PayCom_Code" CHAR(3) NOT NULL );
+
+CREATE UNIQUE INDEX "GSSCode" ON "GCG_3869_Earn_Code"("GSS_Code");
