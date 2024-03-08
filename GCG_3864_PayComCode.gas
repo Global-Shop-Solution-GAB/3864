@@ -1,0 +1,181 @@
+Program.Sub.ScreenSU.Start
+gui.Form1..create
+gui.Form1..caption("PayCom Employee Code")
+gui.Form1..size(3975,2805)
+gui.Form1..minx(0)
+gui.Form1..miny(0)
+gui.Form1..position(0,0)
+gui.Form1..event(unload,form1_unload)
+gui.Form1..alwaysontop(False)
+gui.Form1..fontname("Arial")
+gui.Form1..fontsize(8)
+gui.Form1..forecolor(0)
+gui.Form1..fontstyle(,,,,)
+gui.Form1..BackColor(-2147483633)
+gui.Form1..controlbox(True)
+gui.Form1..maxbutton(False)
+gui.Form1..minbutton(True)
+gui.Form1..mousepointer(0)
+gui.Form1..moveable(True)
+gui.Form1..sizeable(False)
+gui.Form1..ShowInTaskBar(True)
+gui.Form1..titlebar(True)
+gui.Form1.lblCode.create(label,"Employee ID",True,900,255,1,200,200,True,0,Arial,8,-2147483633,0)
+gui.Form1.lblCode.defaultvalue("")
+gui.Form1.lblCode.controlgroup(0)
+gui.Form1.txtEmp.create(textbox,"",True,825,300,0,1200,200,False,0,Arial,8,-2147483643,1)
+gui.Form1.txtEmp.defaultvalue("")
+gui.Form1.txtEmp.controlgroup(0)
+gui.Form1.lblPay.create(label,"PayCom Code",True,1110,255,1,200,800,True,0,Arial,8,-2147483633,0)
+gui.Form1.lblPay.defaultvalue("")
+gui.Form1.lblPay.controlgroup(0)
+gui.Form1.txtPay.create(textbox,"",True,825,300,0,1300,800,True,0,Arial,8,-2147483643,1)
+gui.Form1.txtPay.defaultvalue("")
+gui.Form1.txtPay.controlgroup(0)
+gui.Form1.cmdDone.create(button)
+gui.Form1.cmdDone.caption("Done")
+gui.Form1.cmdDone.visible(True)
+gui.Form1.cmdDone.size(855,375)
+gui.Form1.cmdDone.zorder(0)
+gui.Form1.cmdDone.position(200,1600)
+gui.Form1.cmdDone.enabled(True)
+gui.Form1.cmdDone.fontname("Arial")
+gui.Form1.cmdDone.fontsize(8)
+gui.Form1.cmdDone.event(click,cmddone_click)
+gui.Form1.cmdDone.defaultvalue("")
+gui.Form1.cmdDone.controlgroup(0)
+
+
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+'Created for Netshape by SKC on 5/1/16
+'This is part of ARC project 3864 and uses Custom Table GCG_3869_Pay_Code.
+'Uses Hooks POP - 15340 and Script 1 -15360
+'it will change the text of the script 1 button to PayCom Code
+'The script 1 button will display a form for the user to input the PayCom Employee Code
+
+V.Local.sEmpID.Declare(String)
+V.Local.sPayCom.Declare(String)
+V.Local.sSql.Declare(String)
+
+F.ODBC.Connection!conx.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+F.Intrinsic.Control.SelectCase(V.Caller.Hook)
+
+	F.Intrinsic.Control.Case(15340)
+		V.Passed.000110.Set("PayCom Code")
+	F.Intrinsic.Control.Case(15360)
+		'Set Emp ID
+		V.Local.sEmpID.Set(V.Passed.000003)
+		F.Intrinsic.String.LPad(V.Local.sEmpID,"0",5,V.Local.sEmpID)
+		Gui.Form1.txtEmp.Text(V.Local.sEmpID)
+
+		'See if paycom code exists
+		F.Intrinsic.String.Build("Select PayCom from GCG_3869_Pay_Code Where EmpID ='{0}'",V.Local.sEmpID,V.Local.sSql)
+		F.ODBC.Connection!conx.ExecuteAndReturn(V.Local.sSql,V.Local.sPayCom)
+		Gui.Form1.txtPay.text(V.Local.sPayCom.Trim)
+		'Display Form
+		Gui.Form1..Show
+
+F.Intrinsic.Control.EndSelect
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_PayComCode.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+program.sub.form1_unload.start
+F.Intrinsic.Control.SetErrorHandler("form1_unload_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!conx.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("form1_unload_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_PayComCode.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.form1_unload.end
+
+program.sub.cmddone_click.start
+F.Intrinsic.Control.SetErrorHandler("cmddone_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.sEmp.Declare(String)
+V.Local.sPayCom.Declare(String)
+V.Local.sSql.Declare(String)
+'Save values to Table
+
+
+V.Local.sEmp.Set(V.Screen.Form1!txtEmp.Text)
+V.Local.sPayCom.Set(V.Screen.Form1!txtPay.Text)
+
+F.Intrinsic.Control.If(V.Local.sPayCom.Trim,=,"")
+	F.Intrinsic.UI.Msgbox("Please enter a PayCom Code!","Missing Data")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.String.Build("Select * From GCG_3869_Pay_Code where EmpID ='{0}'",V.Local.sEmp,V.Local.sSql)
+F.ODBC.Connection!conx.OpenLocalRecordsetRW("rstCode",V.Local.sSql)
+F.Intrinsic.Control.If(V.ODBC.conx!rstCode.EOF,=,True)
+	F.ODBC.conx!rstCode.AddNew
+	F.ODBC.conx!rstCode.Set!EmpID(V.Local.sEmp)
+F.Intrinsic.Control.EndIf
+
+F.ODBC.conx!rstCode.Set!PayCom(V.Local.sPayCom)
+F.ODBC.conx!rstCode.Update
+F.Intrinsic.Control.CallSub(Form1_unload)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmddone_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_PayComCode.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmddone_click.end
+
+Program.Sub.Comments.Start
+${$0$}$GCG_3869_PayComCode$}$SKC$}$4/30/2016
+${$1$}$$}$$}$1$}$15360$}$Script 1 button$}$5/1/2016 7:51:56 AM$}$Displays a Form that will allow the user to enter the Paycom Employee Code
+${$1$}$$}$$}$0$}$15340$}$Pop Hook$}$5/1/2016 7:49:55 AM$}$Changes the Text of the Script 1 button to PayCom Code
+${$2$}$$}$$}$1$}$4$}$Custom Table$}$5/1/2016 7:53:28 AM$}$CREATE TABLE "GCG_3869_Pay_Code"(
+ "EmpID" CHAR(5) NOT NULL ,
+ "PayCom" CHAR(5) NOT NULL );
+
+CREATE UNIQUE INDEX "Emp" ON "GCG_3869_Pay_Code"("EmpID");
+${$2$}$$}$$}$0$}$4$}$Passed ID's on Script 1 button$}$5/1/2016 7:49:55 AM$}$.000003 is the Employee ID
+${$3$}$0$}$$}$-1$}$-1$}$$}$1/1/1900$}$This is part of ARC project 3869 and will allow for the Storage of Paycom Employee Codes.  This will be attached to the Script 1 button on the Employee Master.
+
+This portion will change the script 1 button on the employee master to PayCom Code, and allow the user to enter the PayCom employee code associated with the GSS employee code.
+Program.Sub.Comments.End
+
