@@ -1,0 +1,247 @@
+Program.Sub.ScreenSU.Start
+gui.Form1..create
+gui.Form1..caption("Select Excel File")
+gui.Form1..size(8715,2040)
+gui.Form1..minx(0)
+gui.Form1..miny(0)
+gui.Form1..position(0,0)
+gui.Form1..event(unload,form1_unload)
+gui.Form1..alwaysontop(False)
+gui.Form1..fontname("Arial")
+gui.Form1..fontsize(8)
+gui.Form1..forecolor(0)
+gui.Form1..fontstyle(,,,,)
+gui.Form1..BackColor(-2147483633)
+gui.Form1..controlbox(True)
+gui.Form1..maxbutton(True)
+gui.Form1..minbutton(True)
+gui.Form1..mousepointer(0)
+gui.Form1..moveable(True)
+gui.Form1..sizeable(True)
+gui.Form1..ShowInTaskBar(True)
+gui.Form1..titlebar(True)
+gui.Form1.lblFile.create(label,"File",True,1935,255,1,200,200,True,0,Arial,8,-2147483633,0)
+gui.Form1.lblFile.defaultvalue("")
+gui.Form1.lblFile.controlgroup(0)
+gui.Form1.txtFile.create(textbox,"",True,7740,300,0,200,400,True,0,Arial,8,-2147483643,1)
+gui.Form1.txtFile.defaultvalue("")
+gui.Form1.txtFile.controlgroup(0)
+gui.Form1.cmdFile.create(button)
+gui.Form1.cmdFile.caption("^")
+gui.Form1.cmdFile.visible(True)
+gui.Form1.cmdFile.size(300,300)
+gui.Form1.cmdFile.zorder(0)
+gui.Form1.cmdFile.position(8000,400)
+gui.Form1.cmdFile.enabled(True)
+gui.Form1.cmdFile.fontname("Arial")
+gui.Form1.cmdFile.fontsize(8)
+gui.Form1.cmdFile.event(click,cmdfile_click)
+gui.Form1.cmdFile.defaultvalue("")
+gui.Form1.cmdFile.controlgroup(0)
+gui.Form1.cmdUpdate.create(button)
+gui.Form1.cmdUpdate.caption("Update")
+gui.Form1.cmdUpdate.visible(True)
+gui.Form1.cmdUpdate.size(855,375)
+gui.Form1.cmdUpdate.zorder(0)
+gui.Form1.cmdUpdate.position(200,1000)
+gui.Form1.cmdUpdate.enabled(True)
+gui.Form1.cmdUpdate.fontname("Arial")
+gui.Form1.cmdUpdate.fontsize(8)
+gui.Form1.cmdUpdate.event(click,cmdupdate_click)
+gui.Form1.cmdUpdate.defaultvalue("")
+gui.Form1.cmdUpdate.controlgroup(0)
+
+
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+
+Variable.UDT.uEarn.Define("sGSSCode",String,GSS_Code)
+Variable.UDT.uEarn.Define("sPayComCode",String,PayCom_Code)
+Variable.uGlobal.uEarn.Declare("uEarn")
+Variable.UDT.uGSSCode.Define("EC",String)
+Variable.UDT.uGSSCode.Define("Type",String)
+Variable.uGlobal.uGSSCode.Declare("uGSSCode")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+'Created for Netshape by SKC on 5/1/2016
+'This is Part of ARC project 3864.  This portion will run from a Custom Menu item and read an Exce file that is maintained by the user.
+'The excel files have 2 columns  GSS Code Description and PayCom Code.
+'The information from the file will be used to fine the EC code in the "PAY_EARN_1" where WSA_type = 'EARN'
+'The GSS Earn code and the PayCom Code will be stored in a Custom table.
+
+F.ODBC.Connection!conx.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+'Show Form
+Gui.Form1..Show
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_Earn_Code.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+program.sub.form1_unload.start
+F.Intrinsic.Control.SetErrorHandler("form1_unload_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!conx.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("form1_unload_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_Earn_Code.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.form1_unload.end
+
+program.sub.cmdfile_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdfile_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+V.Local.sFile.Declare(String)
+
+'Select File
+F.Intrinsic.UI.ShowOpenFileDialog("","xlsx|*xlsx",V.Caller.FilesDir,V.Local.sFile)
+
+F.Intrinsic.Control.If(V.Local.sFile.Trim,!=,"***CANCEL***")
+	Gui.Form1.txtFile.Text(V.Local.sFile)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdfile_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_Earn_Code.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdfile_click.end
+
+program.sub.cmdupdate_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdupdate_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+V.Local.sFile.Declare(String)
+V.Local.sData.Declare(String)
+V.Local.sGSSCode.Declare(String)
+V.Local.sGSSCode2.Declare(String)
+V.Local.sSql.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.sMes.Declare(String)
+V.Local.bRet.Declare(Boolean)
+V.Local.iCount.Declare(Long)
+V.Local.iCode.Declare(Long)
+V.Local.iUDT.Declare(Long)
+
+V.uGlobal.uGSSCode.Redim(0,9)
+Gui.Form1..Visible(False)
+F.Intrinsic.UI.InvokeWaitDialog("Getting GSS Earning Codes!")
+V.Local.sFile.Set(V.Screen.Form1!txtFile.Text)
+
+F.Intrinsic.Control.If(V.Local.sFile.Trim,!=,"")
+	'Get GSS Earn Code
+	V.Local.sSql.Set("Select Earnings_Desc_1, Earnings_Desc_2, Earnings_Desc_3,Earnings_Desc_4,  Earnings_Desc_5 From PAY_EARN_1 Where WSA_Type = 'EARN'")
+	F.ODBC.Connection!conx.ExecuteAndReturn(V.Local.sSql,V.Local.sGSSCode)
+	F.Intrinsic.String.Split(V.Local.sGSSCode,"#$#",V.Local.sGSSCode)
+	V.Local.sGSSCode.RedimPreserve(0,1)
+	F.Intrinsic.String.Split(V.Local.sGSSCode(0),"*!*",V.Local.sGSSCode2)
+	V.Local.sGSSCode2.RedimPreserve(0,4)
+	F.Intrinsic.Control.For(V.Local.iCount,V.Local.sGSSCode2.LBound,V.Local.sGSSCode2.UBound,1)
+		V.uGlobal.uGSSCode(v.Local.iCount)!Type.Set(V.Local.sGSSCode2(v.Local.iCount).UCase)
+		F.Intrinsic.Math.Add(V.Local.iCount,1,V.Local.iCode)
+		F.Intrinsic.String.LPad(V.Local.iCode,"0",2,V.uGlobal.uGSSCode(v.Local.iCount)!EC)
+	F.Intrinsic.Control.Next(V.Local.iCount)
+
+	F.Intrinsic.String.Split(V.Local.sGSSCode(1),"*!*",V.Local.sGSSCode2)
+	V.Local.sGSSCode2.RedimPreserve(0,4)
+	F.Intrinsic.Control.For(V.Local.iCount,V.Local.sGSSCode2.LBound,V.Local.sGSSCode2.UBound,1)
+		V.Local.iUDT.Set(V.Local.iCode)
+'		F.Intrinsic.Math.Sub(V.Local.iCode,1,V.Local.iUDT)
+		V.uGlobal.uGSSCode(v.Local.iUDT)!Type.Set(V.Local.sGSSCode2(v.Local.iCount).UCase)
+		F.Intrinsic.Math.Add(V.Local.iCode,1,V.Local.iCode)
+		F.Intrinsic.String.LPad(V.Local.iCode,"0",2,V.uGlobal.uGSSCode(v.Local.iUDT)!EC)
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	F.Intrinsic.Variable.UDTMultiFlag(V.uGlobal.uGSSCode!Type,"")
+	F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uGSSCode)
+	F.Intrinsic.UI.ChangeWaitStatus("Getting Paycom Earning Codes!")
+	F.Automation.MSExcel.ReadSpreadsheet(V.Local.sFile,V.Local.sData)
+	F.Intrinsic.Variable.LoadUDTFromString(V.uGlobal.uEarn,"sGSSCode*!*sPayComCode",V.Local.sData,"$!$","*!*",False)
+	F.Intrinsic.Variable.UDTFlagOrdinal(V.uGlobal.uEarn,True,0)
+	F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uEarn)
+
+	'Loop Through udt to match codes
+	F.Intrinsic.Control.For(V.Local.iCount,V.uGlobal.uEarn.LBound,V.uGlobal.uEarn.UBound,1)
+		F.Intrinsic.Variable.UDTMultiSeek(V.uGlobal.uGSSCode!Type,V.uGlobal.uEarn(v.Local.iCount)!sGSSCode.UCase,V.Local.sRet)
+		F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+		F.Intrinsic.Control.If(V.Local.sRet.Trim,!=,"")
+			V.uGlobal.uEarn(v.Local.iCount)!sGSSCode.Set(V.uGlobal.uGSSCode(v.Local.sRet)!EC.UCase)
+		F.Intrinsic.Control.Else
+			F.Intrinsic.String.Build(" Global Shop Earnings Code Not Found for {0}{1}Please Update Earning Codes to Match",V.uGlobal.uEarn(v.Local.iCount)!sGSSCode,V.Ambient.NewLine,V.Local.sMes)
+			F.Intrinsic.UI.Msgbox(V.Local.sMes,"GSS Code Missing")
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Next(V.Local.iCount)
+F.Intrinsic.Control.EndIf
+F.Intrinsic.UI.ChangeWaitStatus("Updating Tables with Earning Codes!")
+'Delete Previous Records
+V.Local.sSql.Set("Delete from GCG_3869_Earn_Code")
+F.ODBC.Connection!conx.Execute(V.Local.sSql)
+
+'Save this info to the table
+V.Local.sSql.Set("Select * From GCG_3869_Earn_Code")
+F.ODBC.Connection!conx.OpenLocalRecordsetRW("rstCode",V.Local.sSql)
+F.Intrinsic.Variable.SaveUDTToRecordSet("conx","rstCode","V.uGlobal.uEarn")
+F.Intrinsic.UI.CloseWaitDialog
+F.Intrinsic.Control.CallSub(Form1_unload)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdupdate_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3864_Earn_Code.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Form1_unload)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdupdate_click.end
+
+Program.Sub.Comments.Start
+${$0$}$GCG_3869_Earn_Code$}$SKC$}$4/30/2016
+${$2$}$$}$$}$1$}$4$}$Custom Table$}$5/1/2016 8:07:26 AM$}$CREATE TABLE "GCG_3869_Earn_Code"(
+ "GSS_Code" CHAR(2) NOT NULL ,
+ "PayCom_Code" CHAR(3) NOT NULL );
+
+CREATE UNIQUE INDEX "GSSCode" ON "GCG_3869_Earn_Code"("GSS_Code");
+${$2$}$$}$$}$0$}$4$}$Custom Menu Item$}$5/1/2016 8:02:47 AM$}$Payroll -> Administration -> PayCom Code
+${$3$}$0$}$$}$-1$}$-1$}$$}$1/1/1900$}$This is a the Maintenance Portion for ARC 3869.  The Paycom Earning Codes will be Match to GSS Earn Codes, and Saved to a Table.
+
+This Part of the ARC project 3864 will run from a custom menu item Payroll -> Administration -> PayCom Code.
+An Excel file will be read that is maintained by the user.  The information from the file will be used to find the EC Code in "PAY_EARN_1" where WSA_type = 'EARN'.  The GSS Earn Code and the PayCom Code will be stored in a Custom Table.
+Program.Sub.Comments.End
+
